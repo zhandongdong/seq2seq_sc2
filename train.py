@@ -37,7 +37,7 @@ def unitRange(races):
 
 FLAGS = flags.FLAGS
 flags.DEFINE_string(name='PATH',
-                    default='/home/zd/MSC/parsed_replays/GlobalFeatureVector/Protoss_vs_Terran/Protoss/',
+                    default='//home/zhandong/mycode/seq2seq/GlobalFeatureVector_noNormal/Protoss_vs_Terran/Protoss/',
                     help='GlobalFeatureVector path')
 flags.DEFINE_string(name='races', default='PvT_P',
                     help='own & enemy race: like PvT_P')
@@ -120,7 +120,7 @@ class DecoderRNN(nn.Module):
         #self.embedding = nn.Embedding(output_size, hidden_size)
         self.gru = nn.GRU(hidden_size, hidden_size)
         self.out = nn.Linear(hidden_size, output_size)
-        self.softmax = nn.LogSoftmax()
+        #self.softmax = nn.LogSoftmax()
 
     def forward(self, input, hidden):
         #output = self.embedding(input).view(1, 1, -1)
@@ -128,8 +128,8 @@ class DecoderRNN(nn.Module):
         for i in range(self.n_layers):
             output = F.relu(output)
             output, hidden = self.gru(output, hidden)
-        output = self.softmax(self.out(output[0]))
-        return output, hidden
+        #output = self.softmax(self.out(output[0]))
+        return output[0][0], hidden
 
     def initHidden(self):
         # result = Variable(torch.zeros(1, 1, self.hidden_size))
@@ -189,9 +189,9 @@ def train(input_variable, target_variable, encoder, decoder, encoder_optimizer, 
             # ni = topi[0][0]
 
             # decoder_input = Variable(torch.FloatTensor([[ni]]))
-            decoder_input = decoder_output.data
-            decoder_input = decoder_input.cuda() if use_cuda else decoder_input
-            ni = decoder_output.data[0]
+            #decoder_input = decoder_output.data
+            #decoder_input = decoder_input.cuda() if use_cuda else decoder_input
+            ni = decoder_output.data
             loss += criterion(decoder_output, target_variable[di])
             sum = 0
             for i in range(len(ni)):
@@ -276,8 +276,8 @@ def trainIters_sc2(enemyUnits, encoder, decoder, n_iters,
             torch.save(encoder1.state_dict(), encode_model_path[:-4] + "_" + str(iter) + ".pkl")
             torch.save(decoder1.state_dict(), decode_model_path[:-4] + "_" + str(iter) + ".pkl")
 
-        if iter % (int(n_iters+1 / 100)) == 0 and lr_base > 0.001:
-            lr_base -= 0.01
+        if iter % (100) == 0 and lr_base > 0.001:
+            lr_base -= 0.001
             if lr_base < 0.001:
                 lr_base = 0.001
             print("lr: " + str(lr_base))
@@ -369,7 +369,7 @@ def decoderContext(cents, decoder):
 # plot units
 
 def unit2index(list, race):
-    path = "/home/zd/MSC/parsed_replays/Stat/{race}.json".format(race=race)
+    path = "/home/data1/zhandong/MSC/parsed_replays/Stat/{race}.json".format(race=race)
     with open(path) as f:
         stat = json.load(f)
     units_name = stat["units_name"]
@@ -501,5 +501,3 @@ if latest_file_encode == "" or latest_file_decode == "":
 else:
     print("already exist, load model:")
     print("exit")
-
-
