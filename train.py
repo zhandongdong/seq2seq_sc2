@@ -131,7 +131,7 @@ class DecoderRNN(nn.Module):
         output = F.relu(self.out(output[0]))
         #return output[0][0], hidden
         return output[0], hidden
-    
+
     def initHidden(self):
         # result = Variable(torch.zeros(1, 1, self.hidden_size))
 
@@ -277,10 +277,10 @@ def trainIters_sc2(enemyUnits, encoder, decoder, n_iters,
             torch.save(encoder1.state_dict(), encode_model_path[:-4] + "_" + str(iter) + ".pkl")
             torch.save(decoder1.state_dict(), decode_model_path[:-4] + "_" + str(iter) + ".pkl")
 
-        if iter % (100) == 0 and lr_base > 0.001:
-            lr_base -= 0.001
-            if lr_base < 0.001:
-                lr_base = 0.001
+        if iter % print_every == 0 and lr_base > 0.01:
+            lr_base -= 0.01
+            if lr_base < 0.01:
+                lr_base = 0.01
             print("lr: " + str(lr_base))
             encoder_optimizer = optim.SGD(encoder.parameters(), lr=lr_base)
             decoder_optimizer = optim.SGD(decoder.parameters(), lr=lr_base)
