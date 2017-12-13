@@ -128,9 +128,10 @@ class DecoderRNN(nn.Module):
         for i in range(self.n_layers):
             output = F.relu(output)
             output, hidden = self.gru(output, hidden)
-        #output = self.softmax(self.out(output[0]))
-        return output[0][0], hidden
-
+        output = F.relu(self.out(output[0]))
+        #return output[0][0], hidden
+        return output[0], hidden
+    
     def initHidden(self):
         # result = Variable(torch.zeros(1, 1, self.hidden_size))
 
@@ -447,10 +448,12 @@ def latestModel(races,model_path):
 
 # Training and Evaluating
 
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import numpy as np
 from sklearn.cluster import KMeans
-import matplotlib.pyplot as plt
 from sklearn.manifold import TSNE
 
 Units, races, friend_and_enemy_range = prepareDataPVP()
@@ -484,7 +487,7 @@ if latest_file_encode == "" or latest_file_decode == "":
         encoder1 = encoder1.cuda()
         print("decoder1 = decoder1.cuda()")
         decoder1 = decoder1.cuda()
-    n_iters = len(Units) * 2
+    n_iters = len(Units) * 5
     training_pairs = []
     print("unit = unit.cuda()")
     for i in range(n_iters):
