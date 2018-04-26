@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-sssss:
-=======
-ddfs f
-
->>>>>>> develop
+test
+test2
+test3
